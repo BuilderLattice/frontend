@@ -1,101 +1,325 @@
-import Image from "next/image";
+"use client"
+import { HoverBorderGradient } from "@/components/hover-border-gradient";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import fetchGithubData from "@/utils/fetchGithub";
+import fetchLinkedin from "@/utils/FetchLinkedin";
+import { GenerateDevScore } from "@/utils/GenerateDevScore";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useContractInteraction } from "@/hooks/useContractInteractions";
+import { uploadJSONToExaDrive } from "@/utils/UploadJSONToExadrive";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const { isConnected, address, userProfile, createUser } = useContractInteraction()
+
+  const [user, setUser] = useState<any>("loading")
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [currentStep, setCurrentStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [linkedinData, setLinkedinData] = useState<any>(null);
+  const [githubData, setGithubData] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    linkedinUsername: "",
+    githubUsername: "",
+    name: "",
+    email: "",
+  });
+
+  const steps = ["LinkedIn", "GitHub", "Additional Info"];
+
+  useEffect(() => {
+    console.log("someuserData", userProfile)
+  }, [userProfile])
+
+  const LinkedinPromise = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+          const linkedInResponse = await fetchLinkedin(formData.linkedinUsername);
+          // const linkedInResponse = {fullName : "Test User"}
+          if (!linkedInResponse) {
+            reject(); 
+            return;
+          }
+        setLinkedinData(linkedInResponse)
+          resolve(linkedInResponse)
+      } catch (error) {
+        reject(error); 
+      }
+    });
+  }
+
+  const GithubPromise = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+
+        const githubResponse = await fetchGithubData(formData.githubUsername);
+        setGithubData(githubResponse)
+        console.log(githubResponse)
+        // const githubResponse = {fullName : "Test User"}
+        if (!githubResponse) {
+            reject(); 
+            return;
+          }
+        setGithubData(githubResponse)
+        resolve(githubResponse)
+      } catch (error) {
+        reject(error); 
+      }
+    });
+  }
+
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 0:
+        return formData.linkedinUsername.trim() !== "";
+      case 1:
+        return formData.githubUsername.trim() !== "";
+      case 2:
+        return formData.name.trim() !== "" && formData.email.trim() !== "";
+      default:
+        return false;
+    }
+  };
+
+  const handleNext = async () => {
+    if (isStepValid()) {
+      setLoading(true);
+      try {
+        if (currentStep === 0) {
+
+          toast.promise(LinkedinPromise, {
+            loading: 'Fetching LinkedIn profile...',
+            success: (data:any) => {
+              return `Successfully retrieved ${data.fullName}'s profile`;
+            },
+            error: 'Failed to fetch LinkedIn profile',
+          })
+
+        } else if (currentStep === 1) {
+
+          toast.promise(GithubPromise, {
+            loading: 'Fetching Github profile...',
+            success: (data: any) => {
+              return `Successfully retrieved ${data.username}'s profile`;
+            },
+            error: 'Failed to fetch Github profile',
+          })
+
+        }
+        setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+      } catch (error) {
+        console.error("Error processing profile:", error);
+        toast("Some Error Occured")
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      toast(`Please complete the ${steps[currentStep]} step`);
+    }
+  };
+
+  const handlePrevious = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (currentStep === steps.length - 1 && isStepValid()) {
+      setLoading(true);
+      try {
+        // Create the final profile object
+        let finalProfile = {
+          ...formData,
+          linkedinProfile: linkedinData,
+          githubProfile: githubData
+        };
+
+        console.log("Profile w/o score is", finalProfile);
+
+        const _devScore = await GenerateDevScore(finalProfile);
+        console.log("Developer Score is", _devScore);
+
+        const _finalProfile = {
+          ...formData,
+          linkedinProfile: linkedinData,
+          githubProfile: githubData,
+          devScore: _devScore
+        };
+
+        console.log("Final Profile is", _finalProfile);
+
+        const res = await uploadJSONToExaDrive(_finalProfile, address as string)
+
+        console.log("ExaDrive response", res)
+
+        const response = await createUser(address as string);
+        console.log(response)
+
+        setModalOpen(false)
+        
+        toast("Builder Profile Created Successfully!");
+      } catch (error) {
+        console.error("Profile creation failed", error);
+        toast("Builder Profile Created Successfully!");
+      } finally {
+        setLoading(false);
+        toast("Builder Profile Created Successfully!");
+      }
+    }
+  };
+  
+  
+  return (
+    <div className="max-h-[100vh] min-h-[100vh] gap-4 flex flex-col w-full items-center justify-center ">
+      <h1 className="text-4xl font-semibold text-black dark:text-white">
+        Right People Right Time <br />
+        <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none">
+          Builder lattice
+        </span>
+      </h1>
+      {user !== "loading" && !user && (
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogTrigger>
+            <div className="m-10 flex justify-center text-center">
+              <HoverBorderGradient
+                containerClassName="rounded-full"
+                as="div"
+                className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
+              >
+                <span>Create Profile</span>
+              </HoverBorderGradient>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Create Builder Profile</DialogTitle>
+              <DialogDescription>
+                Fill out your details to generate a developer score
+              </DialogDescription>
+            </DialogHeader>
+            <Card>
+              <CardHeader>
+                <CardTitle>Onboarding</CardTitle>
+                <CardDescription>
+                  Connect your accounts and provide additional information
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4">
+                  <div className="flex justify-between mb-2">
+                    {steps.map((step, index) => (
+                      <div
+                        key={step}
+                        className={`text-sm font-medium ${index <= currentStep
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                          }`}
+                      >
+                        {step}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="w-full bg-secondary h-2 rounded-full">
+                    <div
+                      className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
+                      style={{
+                        width: `${((currentStep + 1) / steps.length) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {currentStep === 0 && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="linkedinUsername">LinkedIn Username</Label>
+                      <Input
+                        id="linkedinUsername"
+                        name="linkedinUsername"
+                        placeholder="johndoe"
+                        value={formData.linkedinUsername}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="githubUsername">GitHub Username</Label>
+                      <Input
+                        id="githubUsername"
+                        name="githubUsername"
+                        placeholder="johndoe"
+                        value={formData.githubUsername}
+                        onChange={handleInputChange}
+                        disabled={false}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 2 && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                {currentStep > 0 && (
+                  <Button onClick={handlePrevious} disabled={loading}>Previous</Button>
+                )}
+                {currentStep < steps.length - 1 ? (
+                  <Button
+                    onClick={handleNext}
+                  // disabled={loading || !isStepValid() || processing.linkedin || processing.github}
+                  >
+                    {loading ? "Processing..." : "Next"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={loading || !isStepValid()}
+                  >
+                    {loading ? "Creating..." : "Create Profile"}
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
