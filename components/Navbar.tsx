@@ -27,7 +27,7 @@ export function Navbar() {
     }
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 bg-background border-b transition-all duration-300 ${scrollDirection === "down" ? "-translate-y-full" : "translate-y-0"
+        <nav className={`sticky top-0 left-0 right-0 z-50 bg-background border-b transition-all duration-300 ${scrollDirection === "down" ? "-translate-y-full" : "translate-y-0"
             }`}>
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
@@ -39,10 +39,10 @@ export function Navbar() {
                     <div className="flex items-center space-x-4">
                         <Tabs defaultValue="home">
                             <TabsList>
-                                <TabsTrigger value="home">Home</TabsTrigger>
-                                <TabsTrigger value="about">About</TabsTrigger>
-                                <TabsTrigger value="services">Services</TabsTrigger>
-                                <TabsTrigger value="contact">Contact</TabsTrigger>
+                                <Link href={"/"}><TabsTrigger value="home">Home</TabsTrigger></Link>
+                                <Link href={"/people"}><TabsTrigger value="people">People</TabsTrigger></Link>
+                                <Link href={"/market"}><TabsTrigger value="market">Market</TabsTrigger></Link>
+                                <Link href={"/privacy"}><TabsTrigger value="privacy">Privacy</TabsTrigger></Link>
                             </TabsList>
                         </Tabs>
                         <Button variant="outline" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
@@ -52,8 +52,8 @@ export function Navbar() {
                         <ConnectButton />
                         {isConnected ? (
                             <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                                <AvatarFallback>CN</AvatarFallback>
+                                <AvatarImage src={`https://api.dicebear.com/6.x/avataaars/svg?seed=${name}`} />
+                                <AvatarFallback>✨</AvatarFallback>
                             </Avatar>
                         ) : (
                              ""   

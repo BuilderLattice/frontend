@@ -3,7 +3,6 @@ import getTopLanguages from './getTopLang';
 import getActivityData from './getActivityData';
 
 interface GithubData {
-  username : string;
   topLanguages: { [key: string]: number };
   activity: {
     totalCommits: number;
@@ -25,7 +24,6 @@ export default async function fetchGithubData(username: string): Promise<GithubD
     });
 
     return ({
-      username: username,
       topLanguages: getTopLanguages(languagesResponse.data),
       activity: getActivityData(activityResponse.data),
     })

@@ -3,6 +3,7 @@ import abi from "@/lib/abi.json"
 import { Address } from 'viem';
 import { toast } from "sonner";
 import { useEffect } from 'react';
+import { Match, UserStructContract } from '@/utils/types';
 
 export const useContractInteraction = () => {
     const { address, chain, isConnected } = useAccount();
@@ -20,21 +21,60 @@ export const useContractInteraction = () => {
         }
     }, [isConfirming, isConfirmed, error, hash]);
 
+    //Read Contract Calls
 
-    const  {data: userProfile} =  useReadContract({
-        ...abi,
+    const { data: userProfile }: { data: UserStructContract | any} =  useReadContract({
+        abi,
         address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,
         functionName: 'getUser',
         args: [address as Address],
-    })
+        query: {
+            enabled: !!address,
+        },
+        account : address
+    })  
+
+    const { data: userMatches }: { data: Match[] | any} = useReadContract({
+        abi,
+        address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,
+        functionName: 'getUserMatches',
+        args: [address],
+        query: {
+            enabled: !!address,
+        },
+        account : address
+    });
+
+    const { data: allUsers }: { data: UserStructContract[] | any} = useReadContract({
+        abi,
+        address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,
+        functionName: 'getAllUsers',
+        args: [],
+        query: {
+            enabled: !!address,
+        },
+        account : address
+    });
+
 
     const createUser = (_dataHash: string) => {
         console.log('createUser', _dataHash);
         return writeContract({
-            ...abi,
+            abi,
             address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,
             functionName: 'createUser',
             args: [_dataHash]
+        });
+    };
+
+    const addMatchesToContract = (userAddress: Address, matches : Match[]) => {
+        console.log('UserAddres', userAddress, "User's matches", matches );
+
+        return writeContract({
+            abi,
+            address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,
+            functionName: 'addMatches',
+            args: [userAddress, matches]
         });
     };
 
@@ -106,8 +146,11 @@ export const useContractInteraction = () => {
     // }
 
     return {
+        allUsers,
         userProfile,
+        userMatches,
         createUser,
+        addMatchesToContract,
         chain,
         address,
         isConnected,

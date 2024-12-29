@@ -2,7 +2,6 @@
 import { HoverBorderGradient } from "@/components/hover-border-gradient";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
-import fetchGithubData from "@/utils/fetchGithub";
 import fetchLinkedin from "@/utils/FetchLinkedin";
 import { GenerateDevScore } from "@/utils/GenerateDevScore";
 import { useEffect, useState } from "react";
@@ -12,12 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useContractInteraction } from "@/hooks/useContractInteractions";
 import { uploadJSONToExaDrive } from "@/utils/UploadJSONToExadrive";
+import abi from "@/lib/abi.json"
+import { Address } from "viem";
+import { useReadContract } from "wagmi";
+import fetchGithubData from "@/utils/FetchGithub";
+
 
 export default function Home() {
 
-  const { isConnected, address, userProfile, createUser } = useContractInteraction()
-
-  const [user, setUser] = useState<any>("loading")
+  const { isConnected, address, userProfile, createUser, allUsers } = useContractInteraction()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(0);
@@ -32,10 +34,11 @@ export default function Home() {
   });
 
   const steps = ["LinkedIn", "GitHub", "Additional Info"];
-
-  useEffect(() => {
-    console.log("someuserData", userProfile)
-  }, [userProfile])
+    
+    useEffect(() => {
+      console.log("my Profile", userProfile)
+      console.log("all users", allUsers)
+    }, [userProfile, allUsers])
 
   const LinkedinPromise = () => {
     return new Promise(async (resolve, reject) => {
@@ -140,44 +143,37 @@ export default function Home() {
         // Create the final profile object
         let finalProfile = {
           ...formData,
-          linkedinProfile: linkedinData,
-          githubProfile: githubData
-        };
-
-        console.log("Profile w/o score is", finalProfile);
-
-        const _devScore = await GenerateDevScore(finalProfile);
-        console.log("Developer Score is", _devScore);
-
-        const _finalProfile = {
-          ...formData,
+          address : address as Address,
           linkedinProfile: linkedinData,
           githubProfile: githubData,
-          devScore: _devScore
+          devScore : 0,
         };
 
-        console.log("Final Profile is", _finalProfile);
+        const _devScore = await GenerateDevScore(finalProfile);
 
-        const res = await uploadJSONToExaDrive(_finalProfile, address as string)
+        finalProfile = {
+          ...finalProfile,
+          devScore : _devScore
+        };
+
+        console.log("Final Profile is", finalProfile);
+
+        const res = await uploadJSONToExaDrive(finalProfile, address as string)
 
         console.log("ExaDrive response", res)
 
-        const response = await createUser(address as string);
-        console.log(response)
+        createUser(address as string);
 
         setModalOpen(false)
         
-        toast("Builder Profile Created Successfully!");
+        // toast("Builder Profile Created Successfully!");
       } catch (error) {
         console.error("Profile creation failed", error);
-        toast("Builder Profile Created Successfully!");
       } finally {
         setLoading(false);
-        toast("Builder Profile Created Successfully!");
       }
     }
   };
-  
   
   return (
     <div className="max-h-[100vh] min-h-[100vh] gap-4 flex flex-col w-full items-center justify-center ">
@@ -187,7 +183,8 @@ export default function Home() {
           Builder lattice
         </span>
       </h1>
-      {user !== "loading" && !user && (
+     
+      {isConnected && !userProfile && (
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogTrigger>
             <div className="m-10 flex justify-center text-center">
