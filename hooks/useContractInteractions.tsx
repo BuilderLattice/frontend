@@ -34,6 +34,7 @@ export const useContractInteraction = () => {
         account : address
     })  
 
+
     const { data: userMatches }: { data: Match[] | any} = useReadContract({
         abi,
         address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address,

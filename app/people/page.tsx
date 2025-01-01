@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MatchesContainer } from "@/components/MatchesContainer";
 import { getUsersData } from "@/utils/getUsersData";
 import axios from "axios";
-import { Match, UserProfile } from "@/utils/types";
+import { Match } from "@/utils/types";
 import { useContractInteraction } from "@/hooks/useContractInteractions";
 import { getNewUsers } from "@/utils/getNewUsers";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
@@ -175,16 +175,16 @@ export default function Home() {
     };
 
     return (
-        <div className="container min-h-[100vh] mx-auto py-8 flex flex-col gap-8">
+        <div className="pt-24 container min-h-[100vh] mx-auto py-8 flex flex-col gap-8">
             {newMatches?.length > 0 && <div>
                 <div className="text-4xl flex justify-between items-center sm:text-5xl md:text-6xl font-bold mb-8 text-black dark:text-white">
                     <p>New Matches ✨</p>
-                    <div className="flex gap-4">
-                        {newMatches?.length > 0 && <Button onClick={handleAddMatchesToContract} disabled={isLoading}>
+                    <div className="flex gap-4 w-fit">
+                        {newMatches?.length > 0 && <Button onClick={handleAddMatchesToContract} disabled={isLoading} className="font-bold">
                             {!isLoading && < PlusIcon />} {isLoading ? "Loading..." : `Add ${newMatches?.length} matches to Contract`}
                         </Button>}
 
-                        {(userMatches?.length > 0 || newMatches?.length > 0) && <Button onClick={handleGenerateMatches} disabled={isLoading}>
+                        {(userMatches?.length > 0 || newMatches?.length > 0) && <Button onClick={handleGenerateMatches} disabled={isLoading} className="font-bold">
                             {!isLoading && < Sparkles />} {isLoading ? "Loading..." : "Get New Matches"}
                         </Button>}
                     </div>
@@ -193,34 +193,33 @@ export default function Home() {
             </div>}
 
             <div>
-                <div className="text-4xl flex justify-between items-center sm:text-5xl md:text-6xl font-bold mb-8 text-black dark:text-white">
+                {userMatches?.length > 0  &&<div className="text-4xl flex justify-between items-center sm:text-5xl md:text-6xl font-bold mb-8 text-black dark:text-white">
                     <p>My Matches ⚡️</p>
                     <div className="flex gap-4">
-                        {(userMatches?.length > 0 && newMatches?.length === 0) && <Button onClick={handleGenerateMatches} disabled={isLoading}>
+                        {(userMatches?.length > 0 && newMatches?.length === 0) && <Button onClick={handleGenerateMatches} disabled={isLoading} className="font-bold">
                             {!isLoading && < Sparkles />} {isLoading ? "Loading..." : "Get New Matches"}
                         </Button>}
                     </div>
-                </div>
+                </div>}
                 {userMatches?.length === 0 && newMatches?.length === 0 && (
                     <div className="text-center">
                         <p className="text-xl mb-4">No matches to show</p>
-                        <Button onClick={handleGenerateMatches} disabled={isLoading}>
+                        <Button onClick={handleGenerateMatches} disabled={isLoading} className="font-bold">
                             {!isLoading && <Sparkles />} {isLoading ? "Loading..." : "Get Matches"}
                         </Button>
-
-                        {isLoading && <button
-                            className="fixed top-2 right-4 text-black dark:text-white z-[12000]"
-                            onClick={() => setIsLoading(false)}
-                            disabled={isLoading}
-                        >
-                            <IconSquareRoundedX className="h-10 w-10" />
-                        </button>}
                     </div>
                 )}
 
                 {userMatches && <MatchesContainer matches={userMatches} />}
             </div>
             <MultiStepLoader loadingStates={loadingStates} loading={isLoading} duration={2000} />
+            {isLoading && <button
+                className="fixed top-2 right-4 text-black dark:text-white z-[12000]"
+                onClick={() => setIsLoading(false)}
+                disabled={isLoading}
+            >
+                <IconSquareRoundedX className="h-10 w-10" />
+            </button>}
         </div>
     );
 }

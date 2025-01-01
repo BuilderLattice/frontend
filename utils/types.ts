@@ -4,14 +4,62 @@ export type UserStructContract = {
   userAddress: string;
   dataHash: string;
 };
+export type LinkedInProfile = {
+  fullName: string;
+  about: string;
+  headline: string;
+  location: string;
+  profile_photo: string;
+  followers: string;
+  connections: string;
+  certification: {
+    company_image: string;
+    certification: string;
+    company_url: string;
+    company_name: string;
+    issue_date: string;
+    credential_id: string;
+  }[];
+  education: {
+    college_url: string;
+    college_name: string;
+    college_image: string;
+    college_degree: string;
+    college_degree_field: string | null;
+    college_duration: string;
+    college_activity: string;
+  }[];
+  experience: {
+    position: string;
+    company_url: string;
+    company_image: string;
+    company_name: string;
+    location: string | null;
+    summary: string;
+    starts_at: string;
+    ends_at: string;
+    duration: string;
+  }[];
+  description: {
+    description1: string;
+    description1_link: string;
+    description2: string;
+    description2_link: string;
+    description3: string;
+    description3_link: string;
+  };
+  public_identifier: string;
+  background_cover_image_url: string;
+};
+
 
 export type UserProfile = {
-  address : Address
+  address: Address;
   linkedinUsername: string;
   githubUsername: string;
   name: string;
   email: string;
-  linkedinProfile: {} | null;
+  linkedinProfile: LinkedInProfile | null;
   githubProfile: {
     username: string;
     topLanguages: {

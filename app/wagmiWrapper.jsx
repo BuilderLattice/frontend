@@ -12,14 +12,12 @@ const queryClient = new QueryClient();
 
 const wagmiConfig = getDefaultConfig({
     appName: 'Builder Lattice',
-    projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
+    projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     chains: [bscTestnet, opBNBTestnet, opBNB, bsc],
     ssr: false,
 });
 
-const WagmiWrapper = ({ children }: Readonly<{
-    children: ReactNode;
-}>) => {
+const WagmiWrapper = ({ children }) => {
     return (
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <WagmiProvider config={wagmiConfig}>

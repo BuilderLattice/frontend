@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Match } from "@/utils/types";
+import Link from "next/link";
 
 export function UserCard({ userAddress, name, bio, devScore, remark, compatibilityScore,  }: Match) {
     return (
@@ -13,7 +14,7 @@ export function UserCard({ userAddress, name, bio, devScore, remark, compatibili
                     <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
-                    <h3 className="text-2xl font-bold">{name}</h3>
+                    <Link href={`/profile/${userAddress}`}><h3 className="text-2xl font-bold">{name}</h3></Link>
                     <p className="text-sm text-muted-foreground">{bio}</p>
                 </div>
             </CardHeader>
