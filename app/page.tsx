@@ -194,7 +194,7 @@ export default function Home() {
                 </GradientHeading>
             </div>
 
-            {isConnected && !userProfile ? (
+            {isConnected && !userProfile && (
                 <Dialog open={modalOpen} onOpenChange={setModalOpen}>
                     <DialogTrigger>
                         <div className="m-10 flex justify-center text-center">
@@ -322,21 +322,21 @@ export default function Home() {
                         </Card>
                     </DialogContent>
                 </Dialog>
-            ) : (
-                    <div className="mt-8 flex gap-8 justify-center text-center">
-                        <Link href={"/people"}>
-                            <RainbowButton className={"flex gap-2"}>
-                                <UsersRoundIcon /> <p className="font-bold">See Matches</p>
-                            </RainbowButton>
-                        </Link>
-                        <Link href={"/analAIse"}>
-                            <RainbowButton className={"flex gap-2"}>
-                                ✨ <p className="font-bold">analAIse</p>
-                            </RainbowButton>
-                        </Link>
-                    </div>
             )}
-
+            {isConnected && userProfile && (
+                <div className="mt-8 flex gap-8 justify-center text-center">
+                    <Link href={"/people"}>
+                        <RainbowButton className={"flex gap-2"}>
+                            <UsersRoundIcon /> <p className="font-bold">See Matches</p>
+                        </RainbowButton>
+                    </Link>
+                    <Link href={"/analAIse"}>
+                        <RainbowButton className={"flex gap-2"}>
+                            ✨ <p className="font-bold">analAIse</p>
+                        </RainbowButton>
+                    </Link>
+                </div>
+            )}
         </div>
     );
 }
