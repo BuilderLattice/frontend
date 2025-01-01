@@ -1,5 +1,4 @@
 "use client"
-import { HoverBorderGradient } from "@/components/hover-border-gradient";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import fetchLinkedin from "@/utils/FetchLinkedin";
@@ -12,11 +11,11 @@ import { Label } from "@/components/ui/label";
 import { useContractInteraction } from "@/hooks/useContractInteractions";
 import { uploadJSONToExaDrive } from "@/utils/UploadJSONToExadrive";
 import { Address } from "viem";
-import fetchGithubData from "@/utils/FetchGithub";
 import { RainbowButton } from "@/components/ui/rainbow-button"
 import { UserRoundPenIcon, UsersRoundIcon } from "lucide-react";
 import { GradientHeading } from "@/components/ui/gradient-heading";
 import Link from "next/link";
+import fetchGithubData from "../utils/FetchGithub";
 
 
 export default function Home() {
