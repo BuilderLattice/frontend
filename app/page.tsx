@@ -15,7 +15,9 @@ import { RainbowButton } from "@/components/ui/rainbow-button"
 import { UserRoundPenIcon, UsersRoundIcon } from "lucide-react";
 import { GradientHeading } from "@/components/ui/gradient-heading";
 import Link from "next/link";
-import fetchGithubData from "../utils/FetchGithub";
+import axios from "axios";
+import getTopLanguages from "@/utils/getTopLang";
+import getActivityData from "@/utils/getActivityData";
 
 
 export default function Home() {
@@ -56,6 +58,37 @@ export default function Home() {
                 reject(error);
             }
         });
+    }
+
+    interface GithubData {
+        topLanguages: { [key: string]: number };
+        activity: {
+            totalCommits: number;
+            totalPRs: number;
+            contributedTo: number;
+        };
+    }
+
+    async function fetchGithubData(username: string): Promise<GithubData> {
+        try {
+            const [languagesResponse, activityResponse] = await Promise.all([
+                axios.get(`/api/topLang?username=${username}`, { responseType: 'text' }),
+                axios.get(`/api/activityData?username=${username}`, { responseType: 'text' })
+            ]);
+
+            console.log({
+                topLanguages: getTopLanguages(languagesResponse.data),
+                activity: getActivityData(activityResponse.data),
+            });
+
+            return ({
+                topLanguages: getTopLanguages(languagesResponse.data),
+                activity: getActivityData(activityResponse.data),
+            })
+        } catch (error) {
+            console.error('Error fetching GitHub data:', error);
+            throw error;
+        }
     }
 
     const GithubPromise = () => {
