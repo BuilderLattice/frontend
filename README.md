@@ -1,6 +1,7 @@
 # Builder Lattice
 
-⚡️Builder Lattice is a platform that connects like-minded individuals using the power of ✨AI. 
+⚡️Builder Lattice is a platform that connects like-minded individuals using the power of ✨AI.
+
 ⚡️Find collaborators and peers who share your interests, goals, and passions.
 
 🧪**Experimental** - Chat with `analAIse` to get answers to niche queries about the users on the platform.
